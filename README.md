@@ -1,151 +1,192 @@
-# 🚀 API Gateway with Django Microservices and Streamlit UI
+# 🔗 API Gateway with Django Microservices and Streamlit UI
 
-This project demonstrates a microservices architecture using **Django** for backend services (Authentication, Analytics, Data Processing), a **Flask** API Gateway, and a **Streamlit** UI for easy interaction.
-
----
-
-## 📚 Table of Contents
-
-- [💡 Introduction](#-introduction)
-- [🏗 Architecture Overview](#-architecture-overview)
-- [🗂 Project Structure](#-project-structure)
-- [⚙️ Setup & Running Locally](#️-setup--running-locally)
-  - [🔧 Prerequisites](#-prerequisites)
-  - [📦 Clone the Repository](#-clone-the-repository)
-  - [🐍 Virtual Environments](#-virtual-environments)
-  - [📥 Install Dependencies](#-install-dependencies)
-  - [🧱 Database Migrations](#-database-migrations)
-  - [▶️ Running the Services](#-running-the-services)
-- [🌐 Deployment to GitHub](#-deployment-to-github)
-- [✨ Future Enhancements](#-future-enhancements)
-- [🪪 License](#-license)
+This project showcases a microservices architecture using **Django** for backend services (Authentication, Analytics, Data Processing), a **Flask API Gateway** to orchestrate service communication, and a **Streamlit UI** to interact with users.
 
 ---
 
-## 💡 Introduction
+## 📌 Overview
 
-This repository contains a modular microservices-based setup:
-
-- 🧑‍💼 **Authentication Service** (Django): Handles user registration/login  
-- 📊 **Analytics Service** (Django): Tracks user events  
-- ⚙️ **Data Processing Service** (Django): Text transformation APIs  
-- 🔀 **Flask API Gateway**: Routes and unifies communication  
-- 🧑‍🎤 **Streamlit UI**: Web frontend to access services
+- 🔐 **Auth Service** → Register/Login APIs (Django)
+- 📊 **Analytics Service** → Event tracking APIs (Django)
+- 🧠 **Data Service** → Text processing APIs (Django)
+- 🚪 **API Gateway** → Routes all external requests (Flask)
+- 🌐 **UI** → Simple UI to consume services (Streamlit)
 
 ---
 
-## 🏗 Architecture Overview
+## 🏗 Architecture
 
-           ┌──────────────────────┐
-           │     Streamlit UI     │
-           │ http://localhost:8501│
-           └─────────┬────────────┘
-                     │
-             (Requests via Port 5000)
-                     ▼
-           ┌──────────────────────┐
-           │   Flask API Gateway  │
-           │ http://localhost:5000│
-           └─────────┬────────────┘
-        ┌────────────┼────────────┬────────────┐
-        ▼            ▼            ▼
-    ┌────────────┐ ┌────────────┐ ┌────────────┐
-    │ Auth       │ │ Analytics  │ │ Data       │
-    │ Service    │ │ Service    │ │ Service    │
-    │ :8000      │ │ :8001      │ │ :8002      │
-    └────────────┘ └────────────┘ └────────────┘
+```text
++------------------+
+|   Streamlit UI   |
++--------+---------+
+         |
+         v
++--------+---------+        (http://localhost:5000)
+|  Flask API Gateway |
++--------+---------+
+         |
+  -------------------------------
+  |           |                |
+  v           v                v
+ Auth     Analytics       Data Service
+(Django)   (Django)          (Django)
+:8000       :8001             :8002
+````
 
-🗂 Project Structure
+---
 
+## 🗂 Project Structure
+
+```text
 flask_gateway_project/
-├── auth_service/          # Django Authentication Service
-│   ├── accounts/          # Auth app: register/login
-│   ├── auth_service/      # Django project settings
+├── auth_service/               # Django Authentication Service (:8000)
+│   ├── auth_service/           # Django project (settings, urls)
+│   ├── accounts/               # Register/Login logic
 │   └── manage.py
-├── analytics_service/     # Django Analytics Service
-│   └── core/              # Analytics logic
-├── data_service/          # Django Data Processing Service
-│   └── processor/         # Text processing APIs
+├── analytics_service/          # Django Analytics Service (:8001)
+│   ├── analytics_service/
+│   ├── core/                   # Event tracking
+│   └── manage.py
+├── data_service/               # Django Data Processing Service (:8002)
+│   ├── data_service/
+│   ├── processor/              # Text summarization
+│   └── manage.py
 ├── api_gateway/
-│   ├── app.py             # Flask API Gateway
-│   └── routes/            # Modular blueprints
-├── ui_app.py              # Streamlit UI
-├── requirements.txt       # Global or shared requirements
-└── venv/                  # (Optional) Virtual Environment
+│   ├── app.py                  # Flask API Gateway
+│   └── routes/                 # Modular blueprints
+├── ui_app.py                   # Streamlit UI
+├── requirements.txt            # Shared dependencies
+└── venv/                       # Virtual Environment (optional)
+```
 
-⚙️ Setup & Running Locally
+---
 
-🔧 Prerequisites
+## ⚙️ Setup Instructions
 
-Python 3.8+
-pip
+### ✅ Prerequisites
 
-📦 Clone the Repository
-git clone https://github.com/your-username/flask_gateway_project.git
+* Python 3.8+
+* pip
+* Git
+* Virtualenv
+
+---
+
+### 🛠 Installation
+
+🔹 Clone and Setup Project</strong></summary>
+
+```bash
+git clone https://github.com/YOUR_USERNAME/flask_gateway_project.git
 cd flask_gateway_project
+```
 
-🐍 Virtual Environments
+🔹 Set Up Virtual Environments</strong></summary>
+
+* **Main venv** for Flask Gateway + Streamlit:
+
+```bash
 python -m venv venv
-.\venv\Scripts\activate  # Windows
-# source venv/bin/activate  # macOS/Linux
-Repeat for each Django microservice (auth, analytics, data)
-
-📥 Install Dependencies
-Create individual requirements.txt in each service.
-Example for auth_service/requirements.txt:
-Django==5.2.4
-djangorestframework
-django-extensions
-
-Install like so:
-cd auth_service
 .\venv\Scripts\activate
 pip install -r requirements.txt
 deactivate
+```
 
-Repeat for each service and for Flask/Streamlit:
-pip install flask flask-cors requests streamlit
+* **Each Django service (repeat per service)**
 
-🧱 Database Migrations
-For each Django service:
+```bash
 cd auth_service
+python -m venv venv
 .\venv\Scripts\activate
-python manage.py makemigrations
+pip install -r requirements.txt
 python manage.py migrate
+python manage.py createsuperuser
 deactivate
+```
+Repeat for `analytics_service/` and `data_service/`.
+---
 
-▶️ Running the Services
-Start each service in separate terminals:
-# Auth Service (port 8000)
+## 🚀 Running the Project
+
+Run each service in its own terminal:
+
+### 🟩 1. Auth Service
+
+```bash
 cd auth_service
 .\venv\Scripts\activate
 python manage.py runserver 8000
+```
 
-# Analytics Service (port 8001)
+### 🟨 2. Analytics Service
+
+```bash
 cd analytics_service
 .\venv\Scripts\activate
 python manage.py runserver 8001
+```
 
-# Data Service (port 8002)
+### 🟦 3. Data Service
+
+```bash
 cd data_service
 .\venv\Scripts\activate
 python manage.py runserver 8002
+```
 
-# API Gateway (port 5000)
+### 🔵 4. Flask API Gateway
+
+```bash
 cd api_gateway
 .\venv\Scripts\activate
-python app.py
+python app.py  # runs on http://localhost:5000
+```
 
-# Streamlit UI (port 8501)
+### 🟣 5. Streamlit UI
+
+```bash
 cd flask_gateway_project
+.\venv\Scripts\activate
 streamlit run ui_app.py
+```
 
-✨ Future Enhancements
-Add JWT-based authentication
-Dockerize microservices
-Switch to PostgreSQL
-Deploy on AWS/GCP/Azure
+---
 
-🪪 License
+## 🌐 Try Endpoints (Optional)
+
+Test services manually using:
+* Postman / Curl
+* Or visit:
+
+```
+http://localhost:8000/api/register/
+http://localhost:8001/api/track/
+http://localhost:8002/api/process/
+```
+
+---
+
+## 📌 Future Enhancements
+
+* ✅ Dockerize each service
+* 🔐 JWT Authentication across all services
+* 📊 Add database dashboard
+* ☁️ Deploy to Render / Streamlit Cloud
+
+---
+
+## 📄 License
+
 MIT License © 2025 Dhanashree Patil
+
+---
+
+## 🙋‍♀️ Author
+
+**Dhanashree Patil**
+🔗 [LinkedIn](https://www.linkedin.com/in/dhanashree-patil)
+💻 [GitHub](https://github.com/dhanashree-patil)
+
+---
 
